@@ -1,47 +1,129 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { LoginModal } from "./login-modal";
+import { useMultiplayerGame } from "../hooks/use-multiplayer-game";
 
 type Action = "pistola" | "escudo" | "recarga" | null;
-type GamePhase = "menu" | "create" | "join" | "waiting" | "ready" | "countdown" | "choose" | "reveal";
+type GamePhase = "menu" | "login" | "create" | "join" | "waiting" | "ready" | "countdown" | "choose" | "reveal";
 
 export function Multiplayer() {
   const [phase, setPhase] = useState<GamePhase>("menu");
-  const [roomCode, setRoomCode] = useState("");
+  const [showLogin, setShowLogin] = useState(false);
   const [inputCode, setInputCode] = useState("");
-  const [playerRole, setPlayerRole] = useState<"host" | "guest" | null>(null);
+  const [difficulty, setDifficulty] = useState("Normal");
+  const [selectedAction, setSelectedAction] = useState<Action>(null);
+  const [timeLeft, setTimeLeft] = useState(10);
+  const [roundNumber, setRoundNumber] = useState(1);
+  const [lastRoundResult, setLastRoundResult] = useState<any>(null);
 
-  const generateRoomCode = () => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let code = "";
-    for (let i = 0; i < 5; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
+  const {
+    playerId,
+    isAuthenticated,
+    roomData,
+    roomCode,
+    roomStatus,
+    participants,
+    isHost,
+    login,
+    createGameRoom,
+    joinGameRoom,
+    leaveGameRoom,
+    togglePlayerReady,
+    submitAction,
+    resolveGameRound,
+  } = useMultiplayerGame();
+
+  // Redirect to login if not authenticated when trying to play
+  const handleCreateRoom = () => {
+    if (!isAuthenticated) {
+      setShowLogin(true);
+      return;
     }
-    return code;
+    setPhase("create");
   };
 
-  const createRoom = () => {
-    const code = generateRoomCode();
-    setRoomCode(code);
-    setPlayerRole("host");
-    setPhase("waiting");
-    // Aquí conectarás con Convex para crear la sala
+  const handleJoinRoom = () => {
+    if (!isAuthenticated) {
+      setShowLogin(true);
+      return;
+    }
+    setPhase("join");
   };
 
-  const joinRoom = () => {
+  const handleLogin = async (username: string) => {
+    try {
+      await login(username);
+      setShowLogin(false);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  const createRoom = async () => {
+    try {
+      await createGameRoom(difficulty);
+      setPhase("waiting");
+    } catch (error) {
+      console.error("Create room error:", error);
+      alert("Error al crear la sala");
+    }
+  };
+
+  const joinGameRoomAction = async () => {
     if (inputCode.length !== 5) {
       alert("El código debe tener 5 caracteres");
       return;
     }
-    setRoomCode(inputCode.toUpperCase());
-    setPlayerRole("guest");
-    setPhase("waiting");
-    // Aquí conectarás con Convex para unirte a la sala
+    try {
+      await joinGameRoom(inputCode.toUpperCase());
+      setPhase("waiting");
+    } catch (error: any) {
+      console.error("Join room error:", error);
+      alert(error.message || "Error al unirse a la sala");
+    }
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(roomCode);
-    alert("Código copiado al portapapeles");
+    if (roomCode) {
+      navigator.clipboard.writeText(roomCode);
+      alert("Código copiado al portapapeles");
+    }
   };
+
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveGameRoom();
+      setPhase("menu");
+      setInputCode("");
+      setRoundNumber(1);
+      setLastRoundResult(null);
+    } catch (error) {
+      console.error("Leave room error:", error);
+    }
+  };
+
+  const handleToggleReady = async () => {
+    try {
+      await togglePlayerReady();
+    } catch (error: any) {
+      console.error("Toggle ready error:", error);
+      alert(error.message || "Error al cambiar estado");
+    }
+  };
+
+  // Auto-start game when both players are ready
+  useEffect(() => {
+    if (roomStatus === "playing" && phase === "waiting") {
+      setPhase("ready");
+    }
+  }, [roomStatus, phase]);
+
+  // Check if room is finished
+  useEffect(() => {
+    if (roomStatus === "finished") {
+      setPhase("reveal");
+    }
+  }, [roomStatus]);
 
   return (
     <div className="min-h-screen bg-[#e8d5a3] p-3 sm:p-4">
@@ -71,7 +153,17 @@ export function Multiplayer() {
         {/* Menú principal */}
         {phase === "menu" && (
           <div className="border-3 sm:border-4 border-black p-6 sm:p-8 bg-[#d4c5a0]">
-            <p 
+            {isAuthenticated && (
+              <div className="mb-4 p-3 border-2 border-black bg-[#e8d5a0] text-center">
+                <p
+                  className="text-sm"
+                  style={{ fontFamily: "'Special Elite', monospace" }}
+                >
+                  Jugando como: <span className="font-bold">{playerId}</span>
+                </p>
+              </div>
+            )}
+            <p
               className="text-center text-base sm:text-xl mb-6 sm:mb-8"
               style={{ fontFamily: "'Special Elite', monospace" }}
             >
@@ -79,14 +171,14 @@ export function Multiplayer() {
             </p>
             <div className="space-y-3 sm:space-y-4">
               <button
-                onClick={createRoom}
+                onClick={handleCreateRoom}
                 className="w-full border-3 sm:border-4 border-black bg-[#e8d5a3] p-4 sm:p-6 text-xl sm:text-2xl hover:bg-[#d4c5a0] active:translate-x-1 active:translate-y-1 shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)]"
                 style={{ fontFamily: "'Rye', serif" }}
               >
                 CREAR SALA
               </button>
               <button
-                onClick={() => setPhase("join")}
+                onClick={handleJoinRoom}
                 className="w-full border-3 sm:border-4 border-black bg-[#e8d5a3] p-4 sm:p-6 text-xl sm:text-2xl hover:bg-[#d4c5a0] active:translate-x-1 active:translate-y-1 shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)]"
                 style={{ fontFamily: "'Rye', serif" }}
               >
@@ -129,7 +221,7 @@ export function Multiplayer() {
                 CANCELAR
               </button>
               <button
-                onClick={joinRoom}
+                onClick={joinGameRoomAction}
                 className="flex-1 border-3 sm:border-4 border-black bg-[#e8d5a3] p-3 sm:p-4 text-lg sm:text-xl hover:bg-[#d4c5a0] active:translate-x-1 active:translate-y-1 shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)]"
                 style={{ fontFamily: "'Rye', serif" }}
               >
@@ -140,24 +232,24 @@ export function Multiplayer() {
         )}
 
         {/* Esperando jugador */}
-        {phase === "waiting" && (
+        {phase === "waiting" && roomCode && (
           <div className="border-3 sm:border-4 border-black p-6 sm:p-8 bg-[#d4c5a0]">
-            {playerRole === "host" ? (
+            {isHost ? (
               <>
-                <h2 
+                <h2
                   className="text-2xl sm:text-3xl mb-4 sm:mb-6 text-center"
                   style={{ fontFamily: "'Rye', serif" }}
                 >
                   SALA CREADA
                 </h2>
-                <p 
+                <p
                   className="text-center mb-3 sm:mb-4 text-sm sm:text-base"
                   style={{ fontFamily: "'Special Elite', monospace" }}
                 >
                   Comparte este código con tu oponente:
                 </p>
                 <div className="border-3 sm:border-4 border-black p-4 sm:p-6 bg-[#e8d5a3] mb-4 sm:mb-6">
-                  <p 
+                  <p
                     className="text-center text-4xl sm:text-6xl tracking-widest break-all"
                     style={{ fontFamily: "'Rye', serif" }}
                   >
@@ -171,78 +263,185 @@ export function Multiplayer() {
                 >
                   COPIAR CÓDIGO
                 </button>
-                <p 
-                  className="text-center animate-pulse text-sm sm:text-base"
-                  style={{ fontFamily: "'Special Elite', monospace" }}
-                >
-                  Esperando al oponente...
-                </p>
+
+                {/* Show participants */}
+                {participants.length > 0 && (
+                  <div className="mb-4">
+                    <p
+                      className="text-center text-sm mb-2"
+                      style={{ fontFamily: "'Special Elite', monospace" }}
+                    >
+                      Jugadores en sala ({participants.length}/2):
+                    </p>
+                    {participants.map((p) => (
+                      <div
+                        key={p._id}
+                        className="flex justify-between items-center p-2 border-2 border-black bg-[#e8d5a3] mb-2"
+                      >
+                        <span
+                          className="text-sm"
+                          style={{ fontFamily: "'Special Elite', monospace" }}
+                        >
+                          {p.isHost ? "🤠 Anfitrión" : "🎯 Invitado"}
+                        </span>
+                        <span
+                          className={`text-sm ${p.isReady ? "text-green-700" : "text-red-700"}`}
+                          style={{ fontFamily: "'Special Elite', monospace" }}
+                        >
+                          {p.isReady ? "✓ LISTO" : "○ ESPERANDO"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {participants.length === 1 && (
+                  <p
+                    className="text-center animate-pulse text-sm sm:text-base"
+                    style={{ fontFamily: "'Special Elite', monospace" }}
+                  >
+                    Esperando al oponente...
+                  </p>
+                )}
+
+                {participants.length === 2 && (
+                  <button
+                    onClick={handleToggleReady}
+                    className="w-full border-3 sm:border-4 border-black bg-[#e8d5a3] p-3 sm:p-4 text-lg sm:text-xl hover:bg-[#d4c5a0] active:translate-x-1 active:translate-y-1 shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)]"
+                    style={{ fontFamily: "'Rye', serif" }}
+                  >
+                    {participants.find((p) => p.playerId === playerId)?.isReady
+                      ? "NO ESTOY LISTO"
+                      : "ESTOY LISTO"}
+                  </button>
+                )}
               </>
             ) : (
               <>
-                <h2 
+                <h2
                   className="text-2xl sm:text-3xl mb-4 sm:mb-6 text-center"
                   style={{ fontFamily: "'Rye', serif" }}
                 >
-                  CONECTANDO
+                  CONECTADO
                 </h2>
-                <p 
+                <p
                   className="text-center mb-3 sm:mb-4 text-sm sm:text-base"
                   style={{ fontFamily: "'Special Elite', monospace" }}
                 >
                   Sala: {roomCode}
                 </p>
-                <p 
-                  className="text-center animate-pulse text-sm sm:text-base"
-                  style={{ fontFamily: "'Special Elite', monospace" }}
-                >
-                  Buscando sala...
-                </p>
+
+                {/* Show participants */}
+                {participants.length > 0 && (
+                  <div className="mb-4">
+                    <p
+                      className="text-center text-sm mb-2"
+                      style={{ fontFamily: "'Special Elite', monospace" }}
+                    >
+                      Jugadores en sala ({participants.length}/2):
+                    </p>
+                    {participants.map((p) => (
+                      <div
+                        key={p._id}
+                        className="flex justify-between items-center p-2 border-2 border-black bg-[#e8d5a3] mb-2"
+                      >
+                        <span
+                          className="text-sm"
+                          style={{ fontFamily: "'Special Elite', monospace" }}
+                        >
+                          {p.isHost ? "🤠 Anfitrión" : "🎯 Invitado"}
+                        </span>
+                        <span
+                          className={`text-sm ${p.isReady ? "text-green-700" : "text-red-700"}`}
+                          style={{ fontFamily: "'Special Elite', monospace" }}
+                        >
+                          {p.isReady ? "✓ LISTO" : "○ ESPERANDO"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {participants.length === 2 && (
+                  <button
+                    onClick={handleToggleReady}
+                    className="w-full border-3 sm:border-4 border-black bg-[#e8d5a3] p-3 sm:p-4 text-lg sm:text-xl hover:bg-[#d4c5a0] active:translate-x-1 active:translate-y-1 shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)] mb-4"
+                    style={{ fontFamily: "'Rye', serif" }}
+                  >
+                    {participants.find((p) => p.playerId === playerId)?.isReady
+                      ? "NO ESTOY LISTO"
+                      : "ESTOY LISTO"}
+                  </button>
+                )}
               </>
             )}
             <button
-              onClick={() => {
-                setPhase("menu");
-                setRoomCode("");
-                setPlayerRole(null);
-              }}
+              onClick={handleLeaveRoom}
               className="w-full mt-4 sm:mt-6 border-3 sm:border-4 border-black bg-[#e8d5a3] p-3 sm:p-4 text-lg sm:text-xl hover:bg-[#d4c5a0] active:translate-x-1 active:translate-y-1 shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)]"
               style={{ fontFamily: "'Rye', serif" }}
             >
-              CANCELAR
+              SALIR DE LA SALA
             </button>
           </div>
         )}
 
-        {/* Información de backend */}
-        <div className="mt-6 sm:mt-8 border-2 border-black p-4 sm:p-6 bg-[#e8d5a3]">
-          <h3 
-            className="text-lg sm:text-xl mb-3 sm:mb-4 text-center"
-            style={{ fontFamily: "'Rye', serif" }}
-          >
-            NOTA TÉCNICA
-          </h3>
-          <p 
-            className="text-xs sm:text-sm mb-2"
-            style={{ fontFamily: "'Special Elite', monospace" }}
-          >
-            El multijugador online requiere conexión a un backend (Convex o Supabase) para:
-          </p>
-          <ul 
-            className="text-xs sm:text-sm space-y-1 ml-4 sm:ml-6"
-            style={{ fontFamily: "'Special Elite', monospace" }}
-          >
-            <li>• Crear y gestionar salas de juego</li>
-            <li>• Sincronizar acciones entre jugadores</li>
-            <li>• Mantener el estado del juego en tiempo real</li>
-          </ul>
-          <p 
-            className="text-xs sm:text-sm mt-3 sm:mt-4"
-            style={{ fontFamily: "'Special Elite', monospace" }}
-          >
-            La interfaz está preparada para conectar tu backend de elección.
-          </p>
-        </div>
+        {/* Crear sala - difficulty selection */}
+        {phase === "create" && (
+          <div className="border-3 sm:border-4 border-black p-6 sm:p-8 bg-[#d4c5a0]">
+            <h2
+              className="text-2xl sm:text-3xl mb-4 sm:mb-6 text-center"
+              style={{ fontFamily: "'Rye', serif" }}
+            >
+              DIFICULTAD
+            </h2>
+            <p
+              className="text-center mb-6 text-sm"
+              style={{ fontFamily: "'Special Elite', monospace" }}
+            >
+              Elige la dificultad del duelo:
+            </p>
+            <div className="space-y-3">
+              {["Easy", "Normal", "Hard"].map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setDifficulty(diff)}
+                  className={`w-full border-3 sm:border-4 p-4 sm:p-6 text-xl sm:text-2xl shadow-[3px_3px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_rgba(0,0,0,1)] ${
+                    difficulty === diff
+                      ? "bg-black text-white border-black"
+                      : "bg-[#e8d5a3] border-black hover:bg-[#d4c5a0]"
+                  }`}
+                  style={{ fontFamily: "'Rye', serif" }}
+                >
+                  {diff.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setPhase("menu")}
+                className="flex-1 border-3 sm:border-4 border-black bg-[#e8d5a3] p-3 sm:p-4 text-lg hover:bg-[#d4c5a0] shadow-[3px_3px_0px_rgba(0,0,0,1)]"
+                style={{ fontFamily: "'Rye', serif" }}
+              >
+                CANCELAR
+              </button>
+              <button
+                onClick={createRoom}
+                className="flex-1 border-3 sm:border-4 border-black bg-[#e8d5a3] p-3 sm:p-4 text-lg hover:bg-[#d4c5a0] shadow-[3px_3px_0px_rgba(0,0,0,1)]"
+                style={{ fontFamily: "'Rye', serif" }}
+              >
+                CREAR
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Login Modal */}
+        {showLogin && (
+          <LoginModal
+            onLogin={handleLogin}
+            onClose={() => setShowLogin(false)}
+          />
+        )}
       </div>
     </div>
   );

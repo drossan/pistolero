@@ -49,6 +49,8 @@ export default defineConfig({
     alias: {
       // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
+      // Alias convex/_generated to the convex/_generated directory for build
+      'convex/_generated': path.resolve(__dirname, './convex/_generated'),
     },
   },
 
