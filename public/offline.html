@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexión Perdida - Western Pistolero</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Special Elite', monospace;
+      background-color: #e8d5a3;
+      color: #000;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      text-align: center;
+      border: 4px solid #000;
+      padding: 40px;
+      background-color: #d4c5a0;
+      box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+      position: relative;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border: 2px solid #704214;
+      pointer-events: none;
+    }
+
+    h1 {
+      font-family: 'Rye', serif;
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #8B0000;
+      text-shadow: 2px 2px 0px #000;
+    }
+
+    .emoji {
+      font-size: 4rem;
+      margin: 20px 0;
+      animation: sway 2s ease-in-out infinite;
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .tips {
+      text-align: left;
+      margin-top: 30px;
+      padding: 20px;
+      border: 2px dashed #704214;
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .tips h2 {
+      font-family: 'Rye', serif;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .tips ul {
+      list-style-position: inside;
+    }
+
+    .tips li {
+      margin-bottom: 10px;
+    }
+
+    .retry-btn {
+      font-family: 'Rye', serif;
+      background-color: #8B0000;
+      color: #fff;
+      border: 3px solid #000;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+      transition: all 0.1s ease;
+    }
+
+    .retry-btn:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+    }
+
+    .retry-btn:active {
+      transform: translate(4px, 4px);
+      box-shadow: 0px 0px 0px rgba(0, 0, 0, 1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>¡Conexión Perdida!</h1>
+    <div class="emoji">🌵</div>
+    <p>
+      Vaya, vaquero... Parece que te has quedado sin conexión en medio del desierto.
+    </p>
+    <p>
+      No te preocupes, puedes seguir jugando en modo <strong>VS Máquina</strong> mientras tanto.
+    </p>
+
+    <button class="retry-btn" onclick="window.location.reload()">
+      🔄 Reintentar Conexión
+    </button>
+
+    <div class="tips">
+      <h2>💡 Consejos:</h2>
+      <ul>
+        <li>Verifica tu conexión a internet</li>
+        <li>El modo VS Máquina funciona sin conexión</li>
+        <li>Tu progreso se guardará cuando vuelvas a estar online</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Auto-retry every 5 seconds
+    let retryCount = 0
+    const maxRetries = 12 // 1 minute total
+
+    const retryConnection = async () => {
+      if (retryCount >= maxRetries) {
+        console.log('Max retries reached')
+        return
+      }
+
+      retryCount++
+
+      try {
+        // Try to fetch a small resource
+        const response = await fetch('/', { method: 'HEAD' })
+
+        if (response.ok) {
+          // Connection restored, reload the page
+          window.location.reload()
+        }
+      } catch (error) {
+        // Still offline, schedule next retry
+        setTimeout(retryConnection, 5000)
+      }
+    }
+
+    // Start retrying after 2 seconds
+    setTimeout(retryConnection, 2000)
+  </script>
+</body>
+</html>
