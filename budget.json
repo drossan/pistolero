@@ -1,0 +1,17 @@
+[
+  {
+    "path": "./dist/assets/*.js",
+    "limit": "200 KB",
+    "warningThreshold": "180 KB"
+  },
+  {
+    "path": "./dist/assets/*.css",
+    "limit": "30 KB",
+    "warningThreshold": "25 KB"
+  },
+  {
+    "path": "./dist/index.html",
+    "limit": "5 KB",
+    "warningThreshold": "4 KB"
+  }
+]
