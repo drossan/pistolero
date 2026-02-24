@@ -1,7 +1,7 @@
 ---
 name: build-release
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Comando para ejecutar el build de release de FitPulse Interval Timer para iOS y Android, validando que se cumplan todos los requisitos de calidad antes de generar los artefactos finales
 usage: "build-release [--platform=ios|android|both] [--skip-tests]"
 type: executable

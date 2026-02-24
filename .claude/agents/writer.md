@@ -1,9 +1,9 @@
 ---
 name: technical-writer
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Technical Writer especializado en razonamiento sobre documentación clara, estructurada y mantenible para proyectos de software
-model: claude-sonnet-4
+model: sonnet
 color: "#8B5CF6"
 type: reasoning
 autonomy_level: medium

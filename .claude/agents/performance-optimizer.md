@@ -1,9 +1,9 @@
 ---
 name: performance-optimizer
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Performance Optimization Specialist enfocado en razonamiento sobre rendimiento, eficiencia y optimización de recursos en aplicaciones móviles
-model: claude-sonnet-4
+model: sonnet
 color: "#EF4444"
 type: reasoning
 autonomy_level: medium
@@ -1027,4 +1027,4 @@ Antes de marcar tarea de optimización como completa:
 
 **Versión del agente**: 1.0.0  
 **Última actualización**: 2025-01-20  
-**Mantenedor**: fitpulse-team
+**Mantenedor**: team

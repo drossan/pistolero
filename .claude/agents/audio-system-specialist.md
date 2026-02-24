@@ -3,7 +3,7 @@ name: audio-system-specialist
 version: 1.0.0
 author: fitpulse-development-team
 description: Senior Audio System Specialist especializado en razonamiento sobre arquitectura de audio, precarga de sonidos, configuración de sesiones de audio y ejecución en segundo plano para aplicaciones móviles críticas
-model: claude-sonnet-4
+model: sonnet
 color: "#F59E0B"
 type: reasoning
 autonomy_level: medium

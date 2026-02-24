@@ -3,7 +3,7 @@ name: background-execution-expert
 version: 1.0.0
 author: fitpulse-development-team
 description: Senior Background Execution Specialist especializado en razonamiento sobre ejecución en segundo plano, audio en background y gestión de recursos del sistema para aplicaciones móviles críticas
-model: claude-sonnet-4
+model: sonnet
 color: "#DC2626"
 type: reasoning
 autonomy_level: medium

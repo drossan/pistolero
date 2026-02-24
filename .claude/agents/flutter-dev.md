@@ -1,9 +1,9 @@
 ---
 name: flutter-developer
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Senior Flutter Developer especializado en razonamiento sobre arquitectura Clean Architecture + Riverpod y desarrollo de apps móviles de alta confiabilidad
-model: claude-sonnet-4
+model: sonnet
 color: "#02569B"
 type: reasoning
 autonomy_level: medium

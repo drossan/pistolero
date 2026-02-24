@@ -1,7 +1,7 @@
 ---
 name: plan-manage
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Comando meta para gestionar el ciclo de vida completo de planes técnicos en FitPulse Interval Timer, desde su creación hasta aprobación, ejecución y validación
 usage: "plan-manage [create | approve | execute | validate | list | cancel] [plan-id] [--priority=high]"
 type: meta

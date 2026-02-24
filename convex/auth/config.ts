@@ -1,6 +1,6 @@
-// Auth configuration placeholder
-// Will be implemented in next phase with proper Convex Auth setup
+import { convexAuth } from '@convex-dev/auth/server'
+import { GitHub } from '@convex-dev/auth/providers/github'
 
-export const authConfig = {
-  providers: [],
-}
+export const { auth, mutation, query } = convexAuth({
+  providers: [GitHub],
+})

@@ -3,7 +3,7 @@ name: test-coverage-analyzer
 version: 1.0.0
 author: fitpulse-dev-team
 description: Test Coverage Analyzer especializado en razonamiento sobre cobertura de tests para proyectos Flutter con Clean Architecture
-model: claude-sonnet-4
+model: sonnet
 color: "#8B5CF6"
 type: validation
 autonomy_level: medium

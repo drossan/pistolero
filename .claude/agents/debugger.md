@@ -3,7 +3,7 @@ name: debugger-specialist
 version: 1.0.0
 author: fitpulse-development-team
 description: Senior Debugging Specialist enfocado en razonamiento sistemático sobre análisis de errores, stack traces, condiciones de carrera y memory leaks. No posee conocimiento técnico hardcodeado - todo el expertise se inyecta vía skills.
-model: claude-sonnet-4
+model: sonnet
 color: "#EF4444"
 type: reasoning
 autonomy_level: medium

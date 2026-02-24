@@ -3,7 +3,7 @@ name: flutter-planning-agent
 version: 1.0.0
 author: fitpulse-development-team
 description: Planning Agent especializado en razonamiento arquitectónico para desarrollo Flutter con Clean Architecture y Riverpod
-model: claude-sonnet-4
+model: opus
 color: "#02569B"
 type: reasoning
 autonomy_level: medium

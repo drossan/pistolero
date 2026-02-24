@@ -1,7 +1,7 @@
 ---
 name: analyze-code
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Comando para ejecutar análisis estático de código en FitPulse Interval Timer, verificando calidad, arquitectura Clean Architecture y cumplimiento de estándares Flutter/Dart
 usage: "analyze-code [--scope=full|quick|module] [--focus=architecture|performance|security]"
 type: executable

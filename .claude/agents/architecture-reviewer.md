@@ -3,7 +3,7 @@ name: flutter-architect
 version: 1.0.0
 author: danielrossellosanchez
 description: Software Architect especializado en diseño de arquitectura Flutter Clean Architecture + Riverpod, enfocado en razonamiento estructural sobre sistemas escalables y mantenibles sin conocimiento técnico hardcodeado
-model: claude-opus-4
+model: opus
 color: "#02569B"
 type: reasoning
 autonomy_level: high

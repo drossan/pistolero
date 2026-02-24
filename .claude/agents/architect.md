@@ -3,7 +3,7 @@ name: flutter-architect
 version: 1.0.0
 author: fitpulse-development-team
 description: Software Architect especializado en diseño de arquitectura Flutter Clean Architecture + Riverpod, enfocado en razonamiento estructural sobre sistemas escalables y mantenibles sin conocimiento técnico hardcodeado
-model: claude-sonnet-4
+model: sonnet
 color: "#3B82F6"
 type: reasoning
 autonomy_level: medium

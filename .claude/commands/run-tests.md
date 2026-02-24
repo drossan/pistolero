@@ -1,7 +1,7 @@
 ---
 name: run-tests
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Ejecuta la suite de tests de FitPulse Interval Timer con opciones para filtrar por tipo (unit, widget, integration) y genera reportes de cobertura
 usage: "run-tests [--type=all|unit|widget|integration] [--coverage] [--device]"
 type: executable

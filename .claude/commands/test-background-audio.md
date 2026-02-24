@@ -1,7 +1,7 @@
 ---
 name: test-background-audio
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Ejecuta pruebas integrales de audio en segundo plano para validar que el sistema de audio funciona correctamente con la pantalla bloqueada, en background y durante interrupciones del sistema
 usage: "test-background-audio [--device=device-id] [--duration=minutes]"
 type: executable

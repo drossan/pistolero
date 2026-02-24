@@ -3,7 +3,7 @@ name: flutter-orchestrator
 version: 1.0.0
 author: fitpulse-development-team
 description: Orchestration Agent especializado en coordinación de tareas de desarrollo Flutter, gestión de flujos de trabajo y orquestación de múltiples agentes especializados
-model: claude-sonnet-4
+model: sonnet
 color: "#02569B"
 type: orchestration
 autonomy_level: high

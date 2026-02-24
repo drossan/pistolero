@@ -15,6 +15,7 @@
     "lighthouse": "lhci autorun --collect.url=http://localhost:4173"
   },
   "dependencies": {
+    "@convex-dev/auth": "^0.0.90",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/icons-material": "7.3.5",
@@ -80,6 +81,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "4.7.0",
     "@vitest/ui": "^4.0.18",
+    "convex-test": "^0.0.41",
     "glob": "^13.0.6",
     "jsdom": "^28.1.0",
     "tailwindcss": "4.1.12",

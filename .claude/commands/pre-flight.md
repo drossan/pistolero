@@ -1,7 +1,7 @@
 ---
 name: pre-flight
 version: 1.0.0
-author: fitpulse-team
+author: team
 description: Comando de verificación pre-vuelo para FitPulse Interval Timer que valida el estado del proyecto antes de iniciar desarrollo, incluyendo dependencias, configuración de entorno, calidad de código y estado de tests
 usage: "pre-flight [--full] [--skip-tests]"
 type: executable

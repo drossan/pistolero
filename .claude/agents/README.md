@@ -10,7 +10,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#3B82F6"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### technical-writer
@@ -19,7 +19,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#8B5CF6"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### debugger-specialist
@@ -28,7 +28,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#EF4444"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### flutter-planning-agent
@@ -37,7 +37,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#02569B"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### flutter-orchestrator
@@ -46,7 +46,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#02569B"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### flutter-developer
@@ -55,7 +55,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#02569B"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### test-coverage-analyzer
@@ -64,7 +64,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#8B5CF6"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### flutter-architect
@@ -73,7 +73,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#02569B"
 
-**Modelo**: claude-opus-4
+**Modelo**: opus
 ---
 
 ### performance-optimizer
@@ -82,7 +82,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#EF4444"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### background-execution-expert
@@ -91,7 +91,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#DC2626"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ### audio-system-specialist
@@ -100,7 +100,7 @@ Este directorio contiene los agentes especializados del proyecto Fit Pulse.
 
 **Color**: "#F59E0B"
 
-**Modelo**: claude-sonnet-4
+**Modelo**: sonnet
 ---
 
 ## Uso de los Agentes
