@@ -1,0 +1,28 @@
+{
+  "name": "Western Pistolero Game",
+  "short_name": "Pistolero",
+  "description": "Juego de duelos del Viejo Oeste con estrategia y reflejos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8d5a3",
+  "theme_color": "#d4c5a0",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "lang": "es",
+  "dir": "ltr",
+  "scope": "/"
+}
