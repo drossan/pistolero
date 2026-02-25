@@ -41,3 +41,19 @@ export const getCurrentRound = query({
     }
   },
 })
+
+export const getLeaderboard = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const allStats = await ctx.db.query('stats').collect()
+    return allStats
+      .sort((a, b) => b.multiplayerWins - a.multiplayerWins)
+      .slice(0, args.limit ?? 10)
+      .map((stats) => ({
+        stats,
+        playerId: stats.playerId,
+      }))
+  },
+})

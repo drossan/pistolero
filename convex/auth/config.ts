@@ -1,6 +1,7 @@
 import { convexAuth } from '@convex-dev/auth/server'
-import { GitHub } from '@convex-dev/auth/providers/github'
 
+// Configuración inicial con autenticación anónima
+// GitHub OAuth se puede agregar más adelante si se necesita
 export const { auth, mutation, query } = convexAuth({
-  providers: [GitHub],
+  providers: [],
 })
