@@ -125,6 +125,82 @@ export function Multiplayer() {
     }
   }, [roomStatus]);
 
+  // Start countdown when both players are ready
+  useEffect(() => {
+    if (phase === "ready" && participants.length === 2 && participants.every((p) => p.isReady)) {
+      // Start countdown after a short delay
+      const timer = setTimeout(() => {
+        setPhase("countdown");
+        let count = 3;
+        setTimeLeft(count);
+
+        const countdownInterval = setInterval(() => {
+          count -= 1;
+          setTimeLeft(count);
+
+          if (count === 0) {
+            clearInterval(countdownInterval);
+            setPhase("choose");
+            setTimeLeft(10);
+            setSelectedAction(null);
+          }
+        }, 1000);
+
+        return () => clearInterval(countdownInterval);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [phase, participants]);
+
+  // Timer for choose phase
+  useEffect(() => {
+    if (phase === "choose" && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    } else if (phase === "choose" && timeLeft === 0) {
+      // Time's up - auto submit reload as default action
+      handleActionSubmit("reload");
+    }
+  }, [phase, timeLeft]);
+
+  const handleActionSubmit = async (action: "shoot" | "shield" | "reload") => {
+    try {
+      setSelectedAction(action);
+
+      // Submit action to Convex
+      await submitAction(action, roundNumber);
+
+      // Check if both players have submitted (this would come from Convex subscription)
+      // For now, we'll use a simple timeout to simulate waiting for opponent
+      setTimeout(async () => {
+        // Resolve the round
+        const result = await resolveGameRound(roundNumber);
+        setLastRoundResult(result);
+
+        // Check for game over
+        const maxRounds = Math.max(...participants.map((p) => p.roundsWon));
+        if (maxRounds >= 3) {
+          setPhase("reveal");
+        } else {
+          // Start next round
+          setRoundNumber((prev) => prev + 1);
+          setPhase("ready");
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Action submit error:", error);
+      alert("Error al enviar acción");
+    }
+  };
+
+  const getCurrentParticipant = () => {
+    return participants.find((p) => p.playerId === playerId);
+  };
+
   return (
     <div className="min-h-screen bg-[#e8d5a3] p-3 sm:p-4">
       <div className="max-w-2xl mx-auto">
@@ -432,6 +508,62 @@ export function Multiplayer() {
                 CREAR
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Ready phase - show waiting for next round */}
+        {phase === "ready" && (
+          <div className="border-4 border-black p-6 sm:p-8 bg-[#d4c5a0]">
+            <h2
+              className="text-2xl sm:text-3xl mb-4 text-center"
+              style={{ fontFamily: "'Rye', serif" }}
+            >
+              LISTO PARA LA RONDA {roundNumber}
+            </h2>
+
+            {/* Score display */}
+            <div className="mb-6 grid grid-cols-2 gap-4">
+              {participants.map((p) => (
+                <div
+                  key={p._id}
+                  className={`border-3 border-black p-4 text-center ${
+                    p.playerId === playerId ? "bg-[#e8d5a3]" : "bg-[#d4c5a0]"
+                  }`}
+                >
+                  <p
+                    className="text-xs mb-2"
+                    style={{ fontFamily: "'Special Elite', monospace" }}
+                  >
+                    {p.playerId === playerId ? "Tú" : p.isHost ? "Anfitrión" : "Invitado"}
+                  </p>
+                  <p
+                    className="text-3xl font-bold mb-1"
+                    style={{ fontFamily: "'Rye', serif" }}
+                  >
+                    {p.roundsWon}
+                  </p>
+                  <p
+                    className="text-xs"
+                    style={{ fontFamily: "'Special Elite', monospace" }}
+                  >
+                    RONDAS GANADAS
+                  </p>
+                  <p
+                    className="text-sm mt-2"
+                    style={{ fontFamily: "'Special Elite', monospace" }}
+                  >
+                    {p.bullets}💍
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <p
+              className="text-center text-sm sm:text-base animate-pulse"
+              style={{ fontFamily: "'Special Elite', monospace" }}
+            >
+              Esperando para comenzar...
+            </p>
           </div>
         )}
 
