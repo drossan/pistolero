@@ -30,7 +30,7 @@ export function useMultiplayerGame() {
   const createRoom = useMutation(api.rooms.createRoom)
   const joinRoom = useMutation(api.rooms.joinRoom)
   const leaveRoom = useMutation(api.rooms.leaveRoom)
-  const toggleReady = useMutation(api.rooms.toggleReady)
+  const setPlayerReady = useMutation(api.rooms.setPlayerReady)
   const makeMove = useMutation(api.games.makeMove)
   const resolveRound = useMutation(api.games.resolveRound)
 
@@ -105,7 +105,16 @@ export function useMultiplayerGame() {
     if (!currentRoomId || !playerId) throw new Error('Not in a room')
 
     try {
-      await toggleReady({ roomId: currentRoomId, playerId })
+      // Get current participant to find their ready state
+      const participant = roomData?.participants.find(p => p.playerId === playerId)
+      if (!participant) throw new Error('Participant not found')
+
+      // Toggle the ready state
+      await setPlayerReady({
+        roomId: currentRoomId,
+        playerId,
+        isReady: !participant.isReady,
+      })
     } catch (error) {
       console.error('Toggle ready error:', error)
       throw error
