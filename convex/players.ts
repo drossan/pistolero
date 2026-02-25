@@ -1,5 +1,7 @@
 import { v } from 'convex/values'
-import { mutation } from '../_generated/server'
+import { mutation, query } from './_generated/server'
+
+// ==================== PLAYERS ====================
 
 export const createAnonymousPlayer = mutation({
   args: {
@@ -42,5 +44,27 @@ export const updateLastSeen = mutation({
     await ctx.db.patch(args.playerId, {
       lastSeen: Date.now(),
     })
+  },
+})
+
+export const getPlayer = query({
+  args: {
+    playerId: v.id('players'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.playerId)
+  },
+})
+
+export const getPlayerStats = query({
+  args: {
+    playerId: v.id('players'),
+  },
+  handler: async (ctx, args) => {
+    const player = await ctx.db.get(args.playerId)
+    if (!player) {
+      return null
+    }
+    return await ctx.db.get(player.statsId)
   },
 })
