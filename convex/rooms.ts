@@ -181,19 +181,29 @@ export const getRoomWithParticipants = query({
       .withIndex('by_roomId', q => q.eq('roomId', args.roomId))
       .collect()
 
-    const players = await Promise.all(
+    const playersWithNames = await Promise.all(
       participants.map(async p => {
         const player = await ctx.db.get(p.playerId)
         return {
-          ...p,
+          _id: p._id,
+          playerId: p.playerId,
+          isHost: p.isHost,
+          isReady: p.isReady,
+          bullets: p.bullets,
+          roundsWon: p.roundsWon,
           username: player?.username || 'Unknown',
         }
       })
     )
 
     return {
-      ...room,
-      participants: players,
+      _id: room._id,
+      code: room.code,
+      hostId: room.hostId,
+      status: room.status,
+      difficulty: room.difficulty,
+      createdAt: room.createdAt,
+      participants: playersWithNames,
     }
   },
 })
