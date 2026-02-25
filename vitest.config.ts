@@ -16,6 +16,7 @@ export default defineConfig({
       statements: 70,
       exclude: [
         'node_modules/',
+        'tests/e2e/',
         'tests/',
         '**/*.test.{ts,tsx}',
         '**/*.spec.{ts,tsx}',
@@ -24,5 +25,6 @@ export default defineConfig({
       ],
     },
     include: ['tests/**/*.{test,spec}.{ts,tsx}', 'src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['tests/e2e/**', '**/e2e/**'],
   },
 })
