@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { LoginModal } from "./login-modal";
 import { useMultiplayerGame } from "../hooks/use-multiplayer-game";
+import { ChoosePhase, RevealPhase } from "./multiplayer-game-phases";
 
 type Action = "pistola" | "escudo" | "recarga" | null;
 type GamePhase = "menu" | "login" | "create" | "join" | "waiting" | "ready" | "countdown" | "choose" | "reveal";
@@ -509,6 +510,89 @@ export function Multiplayer() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Countdown phase */}
+        {phase === "countdown" && (
+          <div className="border-4 sm:border-4 border-black p-8 sm:p-12 bg-[#d4c5a0]">
+            <h2
+              className="text-2xl sm:text-3xl mb-8 text-center"
+              style={{ fontFamily: "'Rye', serif" }}
+            >
+              RONDA {roundNumber}
+            </h2>
+            <div className="border-4 border-black p-8 sm:p-12 bg-[#e8d5a0] text-center">
+              <p
+                className="text-6xl sm:text-8xl md:text-9xl font-bold animate-pulse"
+                style={{ fontFamily: "'Rye', serif" }}
+              >
+                {timeLeft}
+              </p>
+              <p
+                className="text-xl sm:text-2xl mt-4"
+                style={{ fontFamily: "'Special Elite', monospace" }}
+              >
+                {timeLeft === 3 ? "¡PREPARADOS!" : timeLeft === 2 ? "¡LISTOS!" : "¡YA!"}
+              </p>
+            </div>
+
+            {/* Show round info */}
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              {participants.map((p) => (
+                <div
+                  key={p._id}
+                  className={`border-2 border-black p-3 text-center ${
+                    p.playerId === playerId ? "bg-[#e8d5a3]" : "bg-[#d4c5a0]"
+                  }`}
+                >
+                  <p
+                    className="text-xs mb-1"
+                    style={{ fontFamily: "'Special Elite', monospace" }}
+                  >
+                    {p.playerId === playerId ? "Tú" : p.isHost ? "Anfitrión" : "Invitado"}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ fontFamily: "'Rye', serif" }}>
+                    {p.roundsWon} - {p.isHost ? "0" : "0"}
+                  </p>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ fontFamily: "'Special Elite', monospace" }}
+                  >
+                    {p.bullets}💍
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Choose phase */}
+        {phase === "choose" && (
+          <ChoosePhase
+            timeLeft={timeLeft}
+            roundNumber={roundNumber}
+            getCurrentParticipant={getCurrentParticipant}
+            handleActionSubmit={handleActionSubmit}
+            participants={participants}
+            playerId={playerId || ""}
+          />
+        )}
+
+        {/* Reveal phase */}
+        {phase === "reveal" && lastRoundResult && (
+          <RevealPhase
+            roundNumber={roundNumber}
+            lastRoundResult={lastRoundResult}
+            participants={participants}
+            playerId={playerId || ""}
+            roomStatus={roomStatus || "waiting"}
+            handleLeaveRoom={handleLeaveRoom}
+            onNextRound={() => {
+              setPhase("ready");
+              setSelectedAction(null);
+              setTimeLeft(10);
+            }}
+          />
         )}
 
         {/* Ready phase - show waiting for next round */}
