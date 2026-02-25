@@ -14,10 +14,19 @@ Un juego de duelos del Viejo Oeste con estética de cartel "Wanted" del siglo XI
 - Gana el primero en conseguir 3 victorias
 - IA inteligente que aprende de tus patrones
 
-#### **Multijugador Online** (Pendiente Backend)
-- Sistema de salas compartidas con códigos de 5 letras
-- Juego en tiempo real contra otros jugadores
-- *Requiere conexión a Supabase (no implementado)*
+#### **Multijugador Online** (✅ COMPLETADO)
+- Sistema de salas con códigos de 5 letras
+- Juego en tiempo real con Convex backend
+- Autenticación anónima y GitHub (lista)
+- Sincronización en tiempo real
+- Validación anti-cheat del lado del servidor
+- Leaderboard global
+
+#### **PWA** (✅ IMPLEMENTADO)
+- Instalable como app nativa
+- Soporte offline completo
+- Actualizaciones automáticas
+- Cache inteligente
 
 ---
 
@@ -130,18 +139,38 @@ El juego sigue las reglas clásicas de piedra-papel-tijera del oeste:
 
 ### Frontend
 - **React 18** - Framework principal
-- **TypeScript** - Tipado estático
-- **React Router** - Navegación entre páginas
-- **Vite** - Build tool ultra-rápido
+- **TypeScript** - Tipado estático en todo el stack
+- **React Router v7** - Navegación entre páginas
+- **Vite 6** - Build tool ultra-rápido
 - **Tailwind CSS v4** - Estilos utility-first
+- **Radix UI** - Componentes UI accesibles
 
-### Almacenamiento
-- **LocalStorage** - Estadísticas y progreso
+### Backend
+- **Convex** - Backend-as-a-Service con:
+  - Base de datos en tiempo real
+  - Mutaciones y queries con TypeScript
+  - Sincronización automática
+  - Validación anti-cheat del lado del servidor
+- **Convex Auth** - Autenticación (anónima + GitHub OAuth)
+
+### PWA
+- **Service Workers** - Cache y offline support
+- **Workbox** - Estrategias de cache via Vite PWA plugin
+- **Manifest.json** - Instalación como app nativa
+
+### Testing
+- **Vitest** - Testing framework (72 tests con 70%+ cobertura)
+- **Testing Library** - Pruebas de componentes React
+- **Playwright** - Tests E2E cross-browser
+- **Lighthouse CI** - Validación de performance PWA
+
+### Almacenamiento Local
+- **LocalStorage** - Estadísticas y progreso local
 - **SessionStorage** - Estado de tutorial
+- **Convex Cloud** - Almacenamiento persistente en la nube
 
 ### Audio
-- **Web Audio API** - Efectos de sonido
-- **Howler.js** - Gestión de audio (pendiente si se necesita)
+- **Web Audio API** - Efectos de sonido generados proceduralmente
 
 ---
 
@@ -149,6 +178,17 @@ El juego sigue las reglas clásicas de piedra-papel-tijera del oeste:
 
 ```
 el-pistolero/
+├── convex/                              # Backend Convex
+│   ├── _generated/                      # Archivos generados por Convex
+│   ├── auth/                            # Configuración de autenticación
+│   ├── games/                           # Lógica de juego (mutations, queries)
+│   ├── players/                         # Gestión de jugadores
+│   ├── rooms/                           # Gestión de salas
+│   ├── schema.ts                        # Esquema de base de datos
+│   └── types.ts                         # Tipos compartidos
+├── public/
+│   ├── offline.html                     # Página offline para PWA
+│   └── manifest.json                    # Manifiesto PWA
 ├── src/
 │   ├── app/
 │   │   ├── components/
@@ -156,12 +196,18 @@ el-pistolero/
 │   │   │   ├── game-over-animation.tsx  # Animaciones victoria/derrota
 │   │   │   ├── home.tsx                 # Pantalla principal
 │   │   │   ├── icons.tsx                # Iconos personalizados
-│   │   │   ├── multiplayer.tsx          # Modo multijugador (sin backend)
+│   │   │   ├── leaderboard.tsx          # Tabla de clasificación global
+│   │   │   ├── login-modal.tsx          # Modal de autenticación
+│   │   │   ├── multiplayer-game-phases.tsx # Componentes de fases del juego
+│   │   │   ├── multiplayer.tsx          # Modo multijugador completo
 │   │   │   ├── sounds.ts                # Sistema de sonidos
 │   │   │   ├── stats-modal.tsx          # Modal de estadísticas
 │   │   │   ├── tutorial.tsx             # Tutorial interactivo
+│   │   │   ├── update-banner.tsx        # Banner de actualización PWA
 │   │   │   ├── vs-machine.tsx           # Modo VS Máquina
-│   │   │   └── ui/                      # Componentes UI reutilizables
+│   │   │   └── ui/                      # Componentes UI reutilizables (Radix)
+│   │   ├── hooks/
+│   │   │   └── use-multiplayer-game.ts  # Hook personalizado para lógica multijugador
 │   │   ├── utils/
 │   │   │   ├── ai.ts                    # Motor de IA
 │   │   │   ├── haptics.ts               # Vibración móvil
@@ -174,8 +220,23 @@ el-pistolero/
 │       ├── theme.css                    # Variables y animaciones
 │       ├── tailwind.css                 # Configuración Tailwind
 │       └── index.css                    # Estilos globales
+├── tests/
+│   ├── e2e/                             # Pruebas E2E con Playwright
+│   │   ├── multiplayer.spec.ts          # Tests de flujo multijugador
+│   │   └── setup.spec.ts                # Tests de configuración básica
+│   ├── pwa/                              # Tests PWA
+│   │   ├── performance.test.ts          # Tests de rendimiento
+│   │   └── pwa.test.ts                  # Tests PWA (service worker, manifest)
+│   ├── setup.ts                         # Configuración de tests
+│   └── unit/
+│       └── game-logic.test.ts           # Tests de lógica de juego
+├── .env.local                           # Variables de entorno (local)
+├── convex.config.ts                     # Configuración de Convex
+├── DEPLOYMENT.md                        # Guía de despliegue
 ├── package.json
+├── playwright.config.ts                 # Configuración de Playwright
 ├── vite.config.ts
+├── vitest.config.ts                     # Configuración de Vitest
 └── README.md
 ```
 
@@ -228,53 +289,52 @@ Accede a tus estadísticas desde el botón 📊 en la pantalla principal.
 # Instalar dependencias
 npm install
 
-# Modo desarrollo
+# Modo desarrollo (frontend + backend)
 npm run dev
+
+# Desarrollo con backend Convex
+npx convex dev
 
 # Build para producción
 npm run build
 
 # Preview de producción
 npm run preview
+
+# Ejecutar tests
+npm test              # Unit tests con Vitest
+npm run test:e2e      # Tests E2E con Playwright
 ```
 
 ### Variables de Entorno
-Actualmente no se requieren variables de entorno. Cuando se implemente Supabase:
+Para el modo multijugador, necesitas configurar las variables de entorno de Convex:
 
 ```env
-VITE_SUPABASE_URL=tu_url_aqui
-VITE_SUPABASE_ANON_KEY=tu_key_aqui
+# Convex (se genera automáticamente con `npx convex dev` o `npx convex deploy`)
+CONVEX_DEPLOYMENT_URL=https://western-pistolero-game.convex.cloud
+VITE_CONVEX_URL=https://western-pistolero-game.convex.cloud
+```
+
+**Nota**: Las URLs de Convex se obtienen al ejecutar:
+```bash
+npx convex dev      # Desarrollo
+npx convex deploy   # Producción
 ```
 
 ---
 
-## 🚧 Pendientes de Implementación
+## 🚧 Mejoras Futuras (Opcionales)
 
-### 🔴 Alta Prioridad
-
-#### **Multijugador Online con Supabase**
-- [ ] Conexión a Supabase
-- [ ] Sistema de salas con códigos de 5 letras
-- [ ] Sincronización en tiempo real
-- [ ] Gestión de estado compartido
-- [ ] Manejo de desconexiones
-
-#### **Mejoras de Juego**
-- [ ] Más efectos de sonido
+### 🟡 Mejoras de Juego
 - [ ] Música de fondo opcional
 - [ ] Modos de juego adicionales (mejor de 5, etc.)
-- [ ] Sistema de logros
+- [ ] Sistema de logros y medallas
+- [ ] Más efectos de sonido y animaciones
 
-### 🟡 Media Prioridad
-- [ ] Tabla de clasificación global
-- [ ] Perfiles de usuario
-- [ ] Avatar personalizable
+### 🟢 Características Adicionales
 - [ ] Chat en partidas multijugador
+- [ ] Avatar personalizable
 - [ ] Replay de partidas
-
-### 🟢 Baja Prioridad
-- [ ] PWA (Progressive Web App)
-- [ ] Modo offline mejorado
 - [ ] Compartir en redes sociales
 - [ ] Temas alternativos
 - [ ] Internacionalización (i18n)
@@ -285,12 +345,20 @@ VITE_SUPABASE_ANON_KEY=tu_key_aqui
 
 ### Decisiones de Diseño
 
-**¿Por qué no hay servidor backend todavía?**
-El modo VS Máquina está completamente funcional sin backend. Para el multijugador necesitamos Supabase para:
-- Sincronización en tiempo real
-- Gestión de salas
-- Prevención de trampas
-- Almacenamiento persistente en la nube
+**¿Por qué Convex en lugar de Supabase?**
+Convex ofrece varias ventajas para este proyecto:
+- TypeScript nativo en todo el stack (frontend y backend)
+- Sincronización en tiempo real más simple con queries reactivas
+- Validación anti-cheat del lado del servidor más sencilla
+- Menor boilerplate y mejor DX (Developer Experience)
+- Deploy integrado sin necesidad de configurar funciones edge separadas
+
+**¿Por qué PWA?**
+Permite que el juego se instale como app nativa en móviles y desktop:
+- Funciona offline con service workers
+- Notificaciones de actualizaciones
+- Mejor performance con cache estratégico
+- Experiencia más inmersiva (full screen)
 
 **¿Por qué Tailwind v4?**
 Ofrece mejor performance y DX que v3, con CSS variables nativas y mejor tree-shaking.
@@ -336,9 +404,10 @@ Este proyecto es de código abierto bajo licencia MIT.
 
 ## 🐛 Problemas Conocidos
 
-- El modo multijugador no funciona sin backend
 - En algunos navegadores antiguos, los sonidos pueden no funcionar
 - La vibración háptica solo funciona en móviles compatibles
+- El modo multijugador requiere conexión a internet para sincronizarse con Convex
+- Las estadísticas del modo multijugador solo se guardan en la nube (requieren backend activo)
 
 ---
 
