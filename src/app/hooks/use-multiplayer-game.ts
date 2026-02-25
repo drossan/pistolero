@@ -106,7 +106,7 @@ export function useMultiplayerGame() {
 
     try {
       // Get current participant to find their ready state
-      const participant = roomData?.participants.find(p => p.playerId === playerId)
+      const participant = roomWithParticipants?.participants.find(p => p.playerId === playerId)
       if (!participant) throw new Error('Participant not found')
 
       // Toggle the ready state
