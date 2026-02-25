@@ -6,9 +6,12 @@ export const createAnonymousPlayer = mutation({
     username: v.string(),
   },
   handler: async (ctx, args) => {
+    // Generar un deviceId único usando timestamp y random
+    const deviceId = `${Date.now()}-${Math.random().toString(36).substring(7)}`
+
     const playerId = await ctx.db.insert('players', {
       username: args.username,
-      deviceId: crypto.randomUUID(),
+      deviceId: deviceId,
       statsId: await ctx.db.insert('stats', {
         multiplayerWins: 0,
         multiplayerLosses: 0,
