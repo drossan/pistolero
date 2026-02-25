@@ -10,7 +10,6 @@ export const createAnonymousPlayer = mutation({
       username: args.username,
       deviceId: crypto.randomUUID(),
       statsId: await ctx.db.insert('stats', {
-        playerId: undefined, // Se actualizará después
         multiplayerWins: 0,
         multiplayerLosses: 0,
         bestStreak: 0,
@@ -20,7 +19,7 @@ export const createAnonymousPlayer = mutation({
       lastSeen: Date.now(),
     })
 
-    // Actualizar el statsId con el playerId correcto
+    // Actualizar el stats con el playerId correcto
     const player = await ctx.db.get(playerId)
     if (player) {
       await ctx.db.patch(player.statsId, {

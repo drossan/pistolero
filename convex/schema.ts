@@ -44,7 +44,7 @@ export default defineSchema({
     .index('by_room_round', ['roomId', 'roundNumber']),
 
   stats: defineTable({
-    playerId: v.id('players'),
+    playerId: v.optional(v.id('players')),
     multiplayerWins: v.number(),
     multiplayerLosses: v.number(),
     bestStreak: v.number(),
