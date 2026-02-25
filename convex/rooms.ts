@@ -171,39 +171,44 @@ export const getRoomWithParticipants = query({
     roomId: v.id('rooms'),
   },
   handler: async (ctx, args) => {
-    const room = await ctx.db.get(args.roomId)
-    if (!room) {
+    try {
+      const room = await ctx.db.get(args.roomId)
+      if (!room) {
+        return null
+      }
+
+      const participants = await ctx.db
+        .query('participants')
+        .withIndex('by_roomId', (q) => q.eq('roomId', args.roomId))
+        .collect()
+
+      const participantsWithNames = await Promise.all(
+        participants.map(async (p) => {
+          const player = await ctx.db.get(p.playerId)
+          return {
+            _id: p._id,
+            playerId: p.playerId,
+            isHost: p.isHost,
+            isReady: p.isReady,
+            bullets: p.bullets,
+            roundsWon: p.roundsWon,
+            username: player?.username || 'Unknown',
+          }
+        })
+      )
+
+      return {
+        _id: room._id,
+        code: room.code,
+        hostId: room.hostId,
+        status: room.status,
+        difficulty: room.difficulty,
+        createdAt: room.createdAt,
+        participants: participantsWithNames,
+      }
+    } catch (error) {
+      console.error('Error in getRoomWithParticipants:', error)
       return null
-    }
-
-    const participants = await ctx.db
-      .query('participants')
-      .withIndex('by_roomId', q => q.eq('roomId', args.roomId))
-      .collect()
-
-    const playersWithNames = await Promise.all(
-      participants.map(async p => {
-        const player = await ctx.db.get(p.playerId)
-        return {
-          _id: p._id,
-          playerId: p.playerId,
-          isHost: p.isHost,
-          isReady: p.isReady,
-          bullets: p.bullets,
-          roundsWon: p.roundsWon,
-          username: player?.username || 'Unknown',
-        }
-      })
-    )
-
-    return {
-      _id: room._id,
-      code: room.code,
-      hostId: room.hostId,
-      status: room.status,
-      difficulty: room.difficulty,
-      createdAt: room.createdAt,
-      participants: playersWithNames,
     }
   },
 })
