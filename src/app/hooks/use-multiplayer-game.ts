@@ -80,9 +80,9 @@ export function useMultiplayerGame() {
     if (!playerId) throw new Error('Not logged in')
 
     try {
-      const roomId = await joinRoom({ code, playerId })
-      setCurrentRoomId(roomId)
-      return roomId
+      const result = await joinRoom({ code, playerId })
+      setCurrentRoomId(result.roomId)
+      return result.roomId
     } catch (error) {
       console.error('Join room error:', error)
       throw error
